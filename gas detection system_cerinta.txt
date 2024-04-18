@@ -1,0 +1,3 @@
+Create a gas detection system.
+● If gas is detected 3 valves have to be closed in sequence: V1 , V2 , V3 (simulated by activating dc motors).
+● Then a piezo alarm must go off, and the power to the lighting fixtures must be shut off (Simulated by a LED).

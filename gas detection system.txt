@@ -1,0 +1,73 @@
+const byte LED = 13;
+const byte V1 = 12;
+const byte V2 = 11;
+const byte V3 = 10;
+const int closingValvesTime = 300;
+const byte buzzer = 9;
+const byte gasPin = A0;
+volatile int previousGasValue;
+
+unsigned long V1_startMillis;
+unsigned long V1_endMillis;
+volatile bool V1_closingFlag = false;
+unsigned long V2_startMillis;
+unsigned long V2_endMillis;
+volatile bool V2_closingFlag = false;
+unsigned long V3_startMillis;
+unsigned long V3_endMillis;
+volatile bool V3_closingFlag = false;
+
+void setup(){
+  
+  pinMode(LED, OUTPUT);
+  pinMode(V1, OUTPUT);
+  pinMode(V2, OUTPUT);
+  pinMode(V3, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(gasPin, INPUT);
+}
+
+void loop(){
+  
+  volatile int gasValue = analogRead(gasPin);
+  if (gasValue > 500 ){
+    
+    if(previousGasValue <= 500){
+    	digitalWrite(V1, HIGH);
+    	V1_startMillis = millis();
+        V1_closingFlag = true;
+    }
+    tone(buzzer, 1000, 200);
+    digitalWrite(LED, LOW);
+  }
+  else if (gasValue<= 500 ){
+    noTone(buzzer);
+    digitalWrite(LED, HIGH);   
+  }
+
+  V1_endMillis = millis();
+  if (V1_endMillis - V1_startMillis >= closingValvesTime && V1_closingFlag == true){
+    digitalWrite(V1, LOW);
+    V1_closingFlag = false;
+    digitalWrite(V2, HIGH);
+    V2_startMillis = millis();
+    V2_closingFlag = true;
+  }
+  
+  V2_endMillis = millis();
+  if (V2_endMillis - V2_startMillis >= closingValvesTime && V2_closingFlag == true){
+    digitalWrite(V2, LOW);
+    V2_closingFlag = false;
+    digitalWrite(V3, HIGH);
+    V3_startMillis = millis();
+    V3_closingFlag = true;
+  }
+  
+  V3_endMillis = millis();
+  if (V3_endMillis - V3_startMillis >= closingValvesTime && V3_closingFlag == true){
+    digitalWrite(V3, LOW);
+    V3_closingFlag = false;
+  }
+  
+  previousGasValue = gasValue;
+}
